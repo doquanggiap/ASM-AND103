@@ -99,9 +99,9 @@ public class Login extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(Login.this, "Đăng nhập thành công.", Toast.LENGTH_SHORT).show();
-//                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                                    startActivity(intent);
-//                                    finish();
+                                    Intent intent = new Intent(getApplicationContext(), Home.class);
+                                    startActivity(intent);
+                                    finish();
                                 } else {
                                     Toast.makeText(Login.this, "Tài khoản hoặc mật khẩu sai.",
                                             Toast.LENGTH_SHORT).show();

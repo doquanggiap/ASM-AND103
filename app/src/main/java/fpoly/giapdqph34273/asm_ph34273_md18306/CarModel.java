@@ -7,8 +7,7 @@ public class CarModel {
     private String hang;
     private double gia;
 
-    public CarModel(String _id, String ten, int namSX, String hang, double gia) {
-        this._id = _id;
+    public CarModel(String ten, int namSX, String hang, double gia) {
         this.ten = ten;
         this.namSX = namSX;
         this.hang = hang;
