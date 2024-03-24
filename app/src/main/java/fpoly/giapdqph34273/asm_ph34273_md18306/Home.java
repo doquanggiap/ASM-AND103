@@ -3,6 +3,7 @@ package fpoly.giapdqph34273.asm_ph34273_md18306;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -77,7 +77,7 @@ public class Home extends AppCompatActivity {
 
     public void dialog_them() {
         AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
-        View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_update, null);
         builder.setView(view);
         Dialog dialog = builder.create();
         dialog.show();
@@ -142,6 +142,10 @@ public class Home extends AppCompatActivity {
 
                 CarModel newCar = new CarModel(ten, Integer.parseInt(namSX), hang, Double.parseDouble(gia));
 
+                ProgressDialog progressDialog = new ProgressDialog(Home.this);
+                progressDialog.setMessage("Adding...");
+                progressDialog.show();
+
                 Call<Void> call = apiService.addCar(newCar);
 
                 call.enqueue(new Callback<Void>() {
@@ -156,10 +160,13 @@ public class Home extends AppCompatActivity {
                             Log.e(TAG, "Failed to add car: " + response.message());
                             Toast.makeText(Home.this, "Thêm xe không thành công", Toast.LENGTH_SHORT).show();
                         }
+                        progressDialog.dismiss();
+
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
+                        progressDialog.dismiss();
                         Toast.makeText(Home.this, "Network error", Toast.LENGTH_SHORT).show();
                     }
                 });

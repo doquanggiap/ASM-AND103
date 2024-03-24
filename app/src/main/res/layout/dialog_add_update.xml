@@ -18,6 +18,7 @@
             android:layout_gravity="center_horizontal"
             android:text="Thêm thành phố"
             android:textColor="#F30A0A"
+            android:id="@+id/tvTitle"
             android:textSize="30sp"
             android:textStyle="bold" />
 

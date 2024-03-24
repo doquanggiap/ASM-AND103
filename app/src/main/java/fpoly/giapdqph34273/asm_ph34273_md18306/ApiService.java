@@ -18,9 +18,9 @@ public interface ApiService {
 
     @DELETE("/xoa/{id}")
     Call<Void> deleteCar(@Path("id") String id);
-//
-//    @PUT("/api/update-car/{id}")
-//    Call<Void> updateCar(@Path("id") String id, @Body CarModel carModel);
+
+    @PUT("/update/{id}")
+    Call<Void> updateCar(@Path("id") String id, @Body CarModel carModel);
 
     @POST("/add_xe")
     Call<Void> addCar(@Body CarModel carModel);
