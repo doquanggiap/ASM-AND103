@@ -178,7 +178,7 @@ public class Home extends AppCompatActivity {
             public void onResponse(Call<List<CarModel>> call, Response<List<CarModel>> response) {
                 if (response.isSuccessful()) {
                     carModelList = response.body();
-                    carAdapter = new CarAdapter(getApplicationContext(), carModelList);
+                    carAdapter = new CarAdapter(Home.this, carModelList);
                     carAdapter.notifyDataSetChanged();
                     lvMain.setAdapter(carAdapter);
                 }

@@ -1,10 +1,8 @@
 package fpoly.giapdqph34273.asm_ph34273_md18306;
 
-import android.app.Dialog;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.gms.common.api.Api;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
@@ -52,138 +44,91 @@ public class CarAdapter extends BaseAdapter {
         return position;
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
-            holder = new ViewHolder();
-            holder.txtName = convertView.findViewById(R.id.txtName);
-            holder.txtNamSX = convertView.findViewById(R.id.txtNamSX);
-            holder.txtHang = convertView.findViewById(R.id.txtHang);
-            holder.txtGia = convertView.findViewById(R.id.txtGia);
-            holder.btnSua = convertView.findViewById(R.id.btnSua);
-            holder.btnXoa = convertView.findViewById(R.id.btnXoa);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View rowView = inflater.inflate(R.layout.list_item, parent, false);
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.107.140:3000/") // Thay đổi URL base cho phù hợp với API của bạn
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+        // Khởi tạo Retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiService.DOMAIN)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            apiService = retrofit.create(ApiService.class);
+        // Khởi tạo ApiService từ Retrofit
+        apiService = retrofit.create(ApiService.class);
 
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+//        TextView tvID = rowView.findViewById(R.id.id);
+//        ImageView imgAvatar = rowView.findViewById(R.id.imgAvatatr);
+        TextView tvName = rowView.findViewById(R.id.txtName);
+        TextView tvNamSX = rowView.findViewById(R.id.txtNamSX);
+        TextView tvHang = rowView.findViewById(R.id.txtHang);
+        TextView tvGia = rowView.findViewById(R.id.txtGia);
+
+        Button btnUpdate = rowView.findViewById(R.id.btnSua);
+        Button btnXoa = rowView.findViewById(R.id.btnXoa);
 
         CarModel carModel = carModelList.get(position);
-        holder.txtName.setText(String.valueOf(carModel.getTen()));
-        holder.txtNamSX.setText(String.valueOf(carModel.getNamSX()));
-        holder.txtHang.setText(String.valueOf(carModel.getHang()));
-        holder.txtGia.setText(String.valueOf(carModel.getGia()));
 
-        holder.btnXoa.setOnClickListener(new View.OnClickListener() {
+//        tvID.setText(String.valueOf(carModel.get_id()));
+        tvName.setText("Tên xe: " + carModel.getTen());
+        tvNamSX.setText("Năm SX: " + carModel.getNamSX());
+        tvHang.setText("Hãng: " + carModel.getHang());
+        tvGia.setText("Giá: " + carModel.getGia());
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Call<Void> call = apiService.deleteCar(carModel.get_id());
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()){
-                            notifyDataSetChanged();
-                            Toast.makeText(context, "Xoa thanh cong", Toast.LENGTH_SHORT).show();
-                            
-                        }else {
-//                            Log.e(TAG, "Error deleting student: " + t.getMessage());
-                            Toast.makeText(context, "Xoa that bai", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+//                showDialogToUpdateCar(carModel);
+            }
+        });
 
+        btnXoa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Xác nhận xóa");
+                builder.setMessage("Bạn có chắc chắn muốn xóa xe này không?");
+                builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(context, "xoa that bai failed", Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteCarOnServer(carModel);
                     }
                 });
+                builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Không làm gì cả
+                    }
+                });
+                builder.show();
             }
         });
 
-        holder.btnSua.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                dialogSua();
-            }
-        });
-
-        return convertView;
+        return rowView;
     }
 
-    private static class ViewHolder {
-        TextView txtName;
-        TextView txtNamSX;
-        TextView txtHang;
-        TextView txtGia;
-        Button btnSua,btnXoa;
-    }
-
-    private void dialogSua() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_add, null);
-        builder.setView(view);
-        Dialog dialog = builder.create();
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        TextInputEditText edtTenXe, edtNamSX, edtHang, edtGia;
-        TextInputLayout layoutTenXe, layoutNamSX, layoutHang, layoutGia;
-
-        edtTenXe = view.findViewById(R.id.edtTenXe);
-        edtNamSX = view.findViewById(R.id.edtNamSX);
-        edtHang = view.findViewById(R.id.edtHang);
-        edtGia = view.findViewById(R.id.edtGia);
-
-        layoutTenXe = view.findViewById(R.id.layoutTenXe);
-        layoutNamSX = view.findViewById(R.id.layoutNamSX);
-        layoutHang = view.findViewById(R.id.layoutHang);
-        layoutGia = view.findViewById(R.id.layoutGia);
-
-        Button btnAdd = view.findViewById(R.id.btnThem);
-
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+    private void deleteCarOnServer(CarModel carModel) {
+        Call<Void> call = apiService.deleteCar(carModel.get_id());
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onClick(View v) {
-                String ten = edtTenXe.getText().toString().trim();
-                String namSX = edtNamSX.getText().toString().trim();
-                String hang = edtHang.getText().toString().trim();
-                String gia = edtGia.getText().toString().trim();
-
-                layoutTenXe.setError(null);
-                layoutNamSX.setError(null);
-                layoutHang.setError(null);
-                layoutGia.setError(null);
-
-                if (ten.isEmpty() || namSX.isEmpty() || hang.isEmpty() || gia.isEmpty()) {
-                    if (ten.isEmpty()) {
-                        layoutTenXe.setError("Tên xe đang để trống");
-                    }
-                    if (namSX.isEmpty()) {
-                        layoutNamSX.setError("Năm sản xuất đang để trống");
-                    }
-                    if (hang.isEmpty()) {
-                        layoutHang.setError("Hãng đang để trống");
-                    }
-                    if (gia.isEmpty()) {
-                        layoutGia.setError("Giá đang để trống");
-                    }
-                    return;
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Xóa xe khỏi danh sách
+                    carModelList.remove(carModel);
+                    notifyDataSetChanged();
+                    // Hiển thị thông báo xóa thành công
+                    Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Xử lý khi xóa không thành công
+                    Toast.makeText(context, "Xóa không thành công", Toast.LENGTH_SHORT).show();
                 }
+            }
 
-
-
-
-
-                dialog.dismiss();
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Xử lý khi gặp lỗi trong quá trình gửi yêu cầu
+                Toast.makeText(context, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

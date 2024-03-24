@@ -11,7 +11,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ApiService {
-    String DOMAIN = "http://192.168.107.140:3000/";
+    String DOMAIN = "http://192.168.0.103:3000/";
 
     @GET("/api/list")
     Call<List<CarModel>> getCars();
